@@ -9,37 +9,33 @@ namespace Lab1
         static void Main(string[] args)
         {
 
-            //Факториал 
-
-            Console.Write("Введите неотрицательное целое число n: ");
-            string input = Console.ReadLine();
-
-            try
+            /// <summary>
+            /// Вычисляет n! через BigInteger — без ограничения на n ≤ 20.
+            /// </summary>
+            static BigInteger Factorial(int n)
             {
-                int n = int.Parse(input);
-
-                if (n < 0)
-                {
-                    Console.WriteLine("Ошибка: число должно быть неотрицательным.");
-                    return;
-                }
-
-                BigInteger factorial = 1;
+                BigInteger result = BigInteger.One;
                 for (int i = 2; i <= n; i++)
-                {
-                    factorial *= i;
-                }
+                    result *= i;
+                return result;
+            }
 
-                Console.WriteLine($"Факториал числа {n} равен: {factorial}");
-            }
-            catch (FormatException)
+
+            Console.Write("Введите целое неотрицательное число n: ");
+            string? input = Console.ReadLine();
+
+            if (!int.TryParse(input, out int n) || n < 0)
             {
-                Console.WriteLine("Ошибка: введено не целое число.");
+                Console.WriteLine("Ошибка: нужно ввести целое неотрицательное число.");
+                return;
             }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Ошибка: число слишком большое.");
-            }
+
+            Console.WriteLine($"{n}! = {Factorial(n)}");
+
+
+            //===================================================
+            //===================================================
+
         }
     }
 }
