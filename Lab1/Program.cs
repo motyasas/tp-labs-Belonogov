@@ -11,7 +11,7 @@ namespace Lab1
         {
 
             /// <summary>
-            /// Вычисляет n! через BigInteger — без ограничения на n ≤ 20.
+            /// Вычисляет n! через BigInteger — без ограничения на n <= 20.
             /// </summary>
             static BigInteger Factorial(int n)
             {
@@ -34,12 +34,9 @@ namespace Lab1
             Console.WriteLine($"{n}! = {Factorial(n)}");
 
 
-            //===================================================
-            //===================================================
-
             /// <summary>
             /// Возвращает последовательность чисел Фибоначчи от F(0) до первого F(k) >= n 
-            /// включительно, но не выходящего за n. Если n = 0 — только «0».
+            /// включительно, но не выходящего за n. Если n = 0 — только "0".
             /// </summary>
             static long[] FibonacciUpTo(long n)
             {
@@ -73,6 +70,41 @@ namespace Lab1
             {
                 long[] fibs = FibonacciUpTo(n_scnd);
                 Console.WriteLine(string.Join(", ", fibs));
+            }
+
+            // Задание 3: A = sin(5/x) * ch(sqrt(x - 1)) + e^(5x)
+            // ch(t) — гиперболический косинус: (e^t + e^(-t)) / 2
+
+            Console.Write("\nВведите значение x: ");
+            string? input_x = Console.ReadLine();
+
+            if (!double.TryParse(input_x, out double x))
+            {
+                Console.WriteLine("Ошибка: нужно ввести число.");
+            }
+            else
+            {
+                // Проверка: деление на ноль в sin(5/x)
+                if (x == 0)
+                {
+                    Console.WriteLine("Ошибка: функция не определена при x = 0 (деление на ноль в 5/x).");
+                }
+                // Проверка: отрицательное число под корнем sqrt(x - 1)
+                else if (x < 1)
+                {
+                    Console.WriteLine("Ошибка: функция не определена при x < 1 (отрицательное число под корнем √(x - 1)).");
+                }
+                else
+                {
+                    double sinPart = Math.Sin(5.0 / x);
+                    double sqrtPart = Math.Sqrt(x - 1);
+                    double chPart = Math.Cosh(sqrtPart);   // ch(t) = Math.Cosh(t)
+                    double expPart = Math.Exp(5 * x);
+
+                    double A = sinPart * chPart + expPart;
+
+                    Console.WriteLine($"A = sin(5/x) * ch(√(x-1)) + e^(5x) = {A}");
+                }
             }
         }
     }
