@@ -1,47 +1,50 @@
-﻿namespace lab2;
+﻿using System;
 
-/// <summary>
-/// Депозитный счёт: снятие возможно только после окончания срока вклада;
-/// ежемесячно начисляются проценты.
-/// </summary>
+namespace lab2;
+
+// Депозитный счёт: снять деньги можно только после окончания срока и только всю сумму.
 public class DepositAccount : Account
 {
-    /// <summary>Дата окончания вклада.</summary>
     public DateTime MaturityDate { get; }
-
-    /// <summary>Месячная процентная ставка (например 0.01 = 1%).</summary>
     public decimal MonthlyRate { get; }
-
-    /// <summary>Вклад закрыт (деньги сняты)?</summary>
     public bool IsClosed { get; private set; }
 
-    public DepositAccount(string accountNumber, string ownerName,
-                          decimal initialBalance, decimal monthlyRate, DateTime maturityDate)
+    public DepositAccount(string accountNumber, string ownerName, decimal initialBalance,
+                          decimal monthlyRate, DateTime maturityDate)
         : base(accountNumber, ownerName, initialBalance)
     {
         if (initialBalance <= 0)
-            throw new ArgumentOutOfRangeException(nameof(initialBalance), "Начальная сумма депозита должна быть положительной.");
+        {
+            throw new ArgumentException("Начальная сумма депозита должна быть положительной.");
+        }
         if (monthlyRate <= 0 || monthlyRate >= 1)
-            throw new ArgumentOutOfRangeException(nameof(monthlyRate), "Месячная ставка должна быть в диапазоне (0, 1).");
+        {
+            throw new ArgumentException("Месячная ставка должна быть от 0 до 1.");
+        }
         if (maturityDate <= DateTime.Today)
-            throw new ArgumentOutOfRangeException(nameof(maturityDate), "Дата окончания должна быть в будущем.");
+        {
+            throw new ArgumentException("Дата окончания должна быть в будущем.");
+        }
 
         MonthlyRate = monthlyRate;
         MaturityDate = maturityDate;
+        IsClosed = false;
     }
 
-    /// <summary>
-    /// Снять деньги возможно только после даты окончания и только всю сумму целиком.
-    /// </summary>
     public override decimal Withdraw(decimal amount)
     {
         if (IsClosed)
+        {
             throw new InvalidOperationException("Вклад уже закрыт.");
+        }
         if (DateTime.Today < MaturityDate)
-            throw new InvalidOperationException(
-                $"Вклад нельзя закрыть раньше {MaturityDate:d}. Осталось {(MaturityDate - DateTime.Today).Days} дн.");
+        {
+            throw new InvalidOperationException("Вклад нельзя закрыть раньше " + MaturityDate.ToShortDateString());
+        }
         if (amount != Balance)
-            throw new ArgumentException($"С депозита можно снять только всю сумму: {Balance:C}.");
+        {
+            throw new InvalidOperationException("С депозита можно снять только всю сумму: " + Balance.ToString("C"));
+        }
 
         decimal withdrawn = Balance;
         Balance = 0;
@@ -49,14 +52,21 @@ public class DepositAccount : Account
         return withdrawn;
     }
 
-    /// <summary>Начислить проценты на остаток.</summary>
     public override void ApplyInterest()
     {
-        if (!IsClosed)
-            Balance += Balance * MonthlyRate;
+        if (IsClosed == false)
+        {
+            Balance = Balance + Balance * MonthlyRate;
+        }
     }
 
-    public override string ToString() =>
-        $"{base.ToString()} | {MonthlyRate:P0}/мес, до {MaturityDate:d}" +
-        (IsClosed ? " [ЗАКРЫТ]" : "");
+    public override string ToString()
+    {
+        string text = base.ToString() + " | " + MonthlyRate.ToString("P1") + "/мес, до " + MaturityDate.ToShortDateString();
+        if (IsClosed)
+        {
+            text = text + " [ЗАКРЫТ]";
+        }
+        return text;
+    }
 }

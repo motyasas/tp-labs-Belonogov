@@ -1,45 +1,63 @@
-﻿namespace lab2;
+﻿using System;
 
-/// <summary>
-/// Абстрактный базовый класс банковского счёта.
-/// </summary>
+namespace lab2;
+
+// Абстрактный класс: от него нельзя создать объект напрямую,
+// только от наследников (Debit, Credit, Deposit).
 public abstract class Account : IComparable<Account>
 {
     public string AccountNumber { get; }
     public string OwnerName { get; }
     public decimal Balance { get; protected set; }
 
-    protected Account(string accountNumber, string ownerName, decimal initialBalance = 0)
+    public Account(string accountNumber, string ownerName, decimal initialBalance)
     {
         if (string.IsNullOrWhiteSpace(accountNumber))
-            throw new ArgumentException("Номер счёта не может быть пустым.", nameof(accountNumber));
+        {
+            throw new ArgumentException("Номер счёта не может быть пустым.");
+        }
         if (string.IsNullOrWhiteSpace(ownerName))
-            throw new ArgumentException("Имя владельца не может быть пустым.", nameof(ownerName));
+        {
+            throw new ArgumentException("Имя владельца не может быть пустым.");
+        }
         if (initialBalance < 0)
-            throw new ArgumentOutOfRangeException(nameof(initialBalance), "Начальный баланс не может быть отрицательным.");
+        {
+            throw new ArgumentException("Начальный баланс не может быть отрицательным.");
+        }
 
         AccountNumber = accountNumber;
         OwnerName = ownerName;
         Balance = initialBalance;
     }
 
-    /// <summary>Пополнить счёт.</summary>
-    public virtual void Deposit(decimal amount)
+    // Пополнить счёт
+    public void Deposit(decimal amount)
     {
         if (amount <= 0)
-            throw new ArgumentOutOfRangeException(nameof(amount), "Сумма пополнения должна быть положительной.");
-        Balance += amount;
+        {
+            throw new ArgumentException("Сумма пополнения должна быть положительной.");
+        }
+        Balance = Balance + amount;
     }
 
-    /// <summary>Снять деньги со счёта. Возвращает фактически снятую сумму.</summary>
+    // Снять деньги: у каждого типа счёта своя логика
     public abstract decimal Withdraw(decimal amount);
 
-    /// <summary>Начислить проценты/плату — конкретная логика у каждого типа счёта.</summary>
+    // Начислить проценты: у каждого типа счёта своя логика
     public abstract void ApplyInterest();
 
-    public int CompareTo(Account? other) =>
-        other is null ? 1 : Balance.CompareTo(other.Balance);
+    // Нужен для сортировки по балансу
+    public int CompareTo(Account other)
+    {
+        if (other == null)
+        {
+            return 1;
+        }
+        return Balance.CompareTo(other.Balance);
+    }
 
-    public override string ToString() =>
-        $"[{GetType().Name}] #{AccountNumber} ({OwnerName}): {Balance:C}";
+    public override string ToString()
+    {
+        return "[" + GetType().Name + "] #" + AccountNumber + " (" + OwnerName + "): " + Balance.ToString("C");
+    }
 }

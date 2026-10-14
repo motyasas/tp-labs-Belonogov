@@ -1,64 +1,141 @@
-﻿namespace lab2;
+﻿using System;
+using System.Collections.Generic;
 
-/// <summary>
-/// Класс-менеджер: хранит все счета и предоставляет статистику.
-/// </summary>
+namespace lab2;
+
+// Банк хранит список всех счетов и умеет считать по ним статистику.
 public class Bank
 {
-    private readonly List<Account> _accounts = [];
+    private List<Account> _accounts = new List<Account>();
 
     public string Name { get; }
 
     public Bank(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Название банка не может быть пустым.", nameof(name));
+        {
+            throw new ArgumentException("Название банка не может быть пустым.");
+        }
         Name = name;
     }
 
-    /// <summary>Открыть новый счёт.</summary>
+    // Открыть новый счёт
     public void OpenAccount(Account account)
     {
-        ArgumentNullException.ThrowIfNull(account);
-        if (FindByNumber(account.AccountNumber) is not null)
-            throw new ArgumentException($"Счёт №{account.AccountNumber} уже существует.");
+        if (account == null)
+        {
+            throw new ArgumentException("Счёт не может быть null.");
+        }
+        if (FindByNumber(account.AccountNumber) != null)
+        {
+            throw new ArgumentException("Счёт №" + account.AccountNumber + " уже существует.");
+        }
         _accounts.Add(account);
     }
 
-    /// <summary>Найти счёт по номеру.</summary>
-    public Account? FindByNumber(string accountNumber) =>
-        _accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
+    // Найти счёт по номеру (если не найден — вернёт null)
+    public Account FindByNumber(string accountNumber)
+    {
+        foreach (Account account in _accounts)
+        {
+            if (account.AccountNumber == accountNumber)
+            {
+                return account;
+            }
+        }
+        return null;
+    }
 
-    /// <summary>Все счета указанного владельца.</summary>
-    public IEnumerable<Account> GetByOwner(string ownerName) =>
-        _accounts.Where(a => a.OwnerName.Contains(ownerName, StringComparison.OrdinalIgnoreCase));
+    // Все счета, у которых имя владельца содержит заданный текст
+    public List<Account> GetByOwner(string ownerName)
+    {
+        List<Account> result = new List<Account>();
+        foreach (Account account in _accounts)
+        {
+            if (account.OwnerName.Contains(ownerName))
+            {
+                result.Add(account);
+            }
+        }
+        return result;
+    }
 
-    /// <summary>Суммарные активы (сумма всех положительных балансов).</summary>
-    public decimal TotalAssets =>
-        _accounts.Where(a => a.Balance > 0).Sum(a => a.Balance);
+    // Сумма всех положительных балансов
+    public decimal GetTotalAssets()
+    {
+        decimal total = 0;
+        foreach (Account account in _accounts)
+        {
+            if (account.Balance > 0)
+            {
+                total = total + account.Balance;
+            }
+        }
+        return total;
+    }
 
-    /// <summary>Суммарный долг (сумма отрицательных балансов, как положительное число).</summary>
-    public decimal TotalDebt =>
-        _accounts.Where(a => a.Balance < 0).Sum(a => -a.Balance);
+    // Сумма всех долгов (как положительное число)
+    public decimal GetTotalDebt()
+    {
+        decimal total = 0;
+        foreach (Account account in _accounts)
+        {
+            if (account.Balance < 0)
+            {
+                total = total - account.Balance;
+            }
+        }
+        return total;
+    }
 
-    /// <summary>Применить начисление процентов ко всем счетам.</summary>
-    public void ApplyMonthlyInterestToAll() =>
-        _accounts.ForEach(a => a.ApplyInterest());
+    // Начислить проценты на всех счетах
+    // (каждый счёт делает это по-своему — это и есть полиморфизм)
+    public void ApplyMonthlyInterestToAll()
+    {
+        foreach (Account account in _accounts)
+        {
+            account.ApplyInterest();
+        }
+    }
 
-    /// <summary>Счета, сгруппированные по типу, с суммами.</summary>
-    public IEnumerable<(string Type, int Count, decimal TotalBalance)> GetStatsByType() =>
-        _accounts
-            .GroupBy(a => a.GetType().Name)
-            .Select(g => (Type: g.Key, Count: g.Count(), TotalBalance: g.Sum(a => a.Balance)))
-            .OrderByDescending(x => x.TotalBalance);
+    // Сколько счетов указанного типа (например "DebitAccount")
+    public int CountByType(string typeName)
+    {
+        int count = 0;
+        foreach (Account account in _accounts)
+        {
+            if (account.GetType().Name == typeName)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 
-    /// <summary>Отсортированный список счетов по балансу.</summary>
+    // Сумма балансов счетов указанного типа
+    public decimal SumByType(string typeName)
+    {
+        decimal total = 0;
+        foreach (Account account in _accounts)
+        {
+            if (account.GetType().Name == typeName)
+            {
+                total = total + account.Balance;
+            }
+        }
+        return total;
+    }
+
+    // Список счетов, отсортированный по балансу
     public List<Account> GetSortedAccounts()
     {
-        List<Account> sorted = [.. _accounts];
-        sorted.Sort(); // IComparable<Account>
+        List<Account> sorted = new List<Account>(_accounts);
+        sorted.Sort();
         return sorted;
     }
 
-    public override string ToString() => $"Банк «{Name}» | счетов: {_accounts.Count}";
+    public override string ToString()
+    {
+        return "Банк «" + Name + "» | счетов: " + _accounts.Count;
+    }
 }
