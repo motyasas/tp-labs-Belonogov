@@ -30,11 +30,7 @@ public class DebitAccount : Account
     }
 
     /// <summary>Начислить кэшбэк на текущий остаток.</summary>
-    public override void ApplyInterest()
-    {
-        decimal cashback = Balance * CashbackRate;
-        Balance += cashback;
-    }
+    public override void ApplyInterest() => Balance += Balance * CashbackRate;
 
     public override string ToString() =>
         $"{base.ToString()} | кэшбэк {CashbackRate:P1}";

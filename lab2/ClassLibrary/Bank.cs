@@ -20,7 +20,7 @@ public class Bank
     public void OpenAccount(Account account)
     {
         ArgumentNullException.ThrowIfNull(account);
-        if (_accounts.Any(a => a.AccountNumber == account.AccountNumber))
+        if (FindByNumber(account.AccountNumber) is not null)
             throw new ArgumentException($"Счёт №{account.AccountNumber} уже существует.");
         _accounts.Add(account);
     }
@@ -37,16 +37,13 @@ public class Bank
     public decimal TotalAssets =>
         _accounts.Where(a => a.Balance > 0).Sum(a => a.Balance);
 
-    /// <summary>Суммарный долг (сумма всех отрицательных балансов, возвращается как положительное число).</summary>
+    /// <summary>Суммарный долг (сумма отрицательных балансов, как положительное число).</summary>
     public decimal TotalDebt =>
         _accounts.Where(a => a.Balance < 0).Sum(a => -a.Balance);
 
     /// <summary>Применить начисление процентов ко всем счетам.</summary>
-    public void ApplyMonthlyInterestToAll()
-    {
-        foreach (var account in _accounts)
-            account.ApplyInterest();
-    }
+    public void ApplyMonthlyInterestToAll() =>
+        _accounts.ForEach(a => a.ApplyInterest());
 
     /// <summary>Счета, сгруппированные по типу, с суммами.</summary>
     public IEnumerable<(string Type, int Count, decimal TotalBalance)> GetStatsByType() =>
@@ -58,7 +55,7 @@ public class Bank
     /// <summary>Отсортированный список счетов по балансу.</summary>
     public List<Account> GetSortedAccounts()
     {
-        var sorted = new List<Account>(_accounts);
+        List<Account> sorted = [.. _accounts];
         sorted.Sort(); // IComparable<Account>
         return sorted;
     }

@@ -5,16 +5,9 @@
 /// </summary>
 public abstract class Account : IComparable<Account>
 {
-    private decimal _balance;
-
     public string AccountNumber { get; }
     public string OwnerName { get; }
-
-    public decimal Balance
-    {
-        get => _balance;
-        protected set => _balance = value;
-    }
+    public decimal Balance { get; protected set; }
 
     protected Account(string accountNumber, string ownerName, decimal initialBalance = 0)
     {
@@ -27,7 +20,7 @@ public abstract class Account : IComparable<Account>
 
         AccountNumber = accountNumber;
         OwnerName = ownerName;
-        _balance = initialBalance;
+        Balance = initialBalance;
     }
 
     /// <summary>Пополнить счёт.</summary>
@@ -35,7 +28,7 @@ public abstract class Account : IComparable<Account>
     {
         if (amount <= 0)
             throw new ArgumentOutOfRangeException(nameof(amount), "Сумма пополнения должна быть положительной.");
-        _balance += amount;
+        Balance += amount;
     }
 
     /// <summary>Снять деньги со счёта. Возвращает фактически снятую сумму.</summary>
@@ -44,11 +37,8 @@ public abstract class Account : IComparable<Account>
     /// <summary>Начислить проценты/плату — конкретная логика у каждого типа счёта.</summary>
     public abstract void ApplyInterest();
 
-    public int CompareTo(Account? other)
-    {
-        if (other is null) return 1;
-        return Balance.CompareTo(other.Balance);
-    }
+    public int CompareTo(Account? other) =>
+        other is null ? 1 : Balance.CompareTo(other.Balance);
 
     public override string ToString() =>
         $"[{GetType().Name}] #{AccountNumber} ({OwnerName}): {Balance:C}";

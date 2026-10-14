@@ -3,27 +3,21 @@
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 // ─── Создание банка и счетов ──────────────────────────────────────────────────
-var bank = new Bank("Альфа-Банк");
+Bank bank = new("Альфа-Банк");
 
-var debit1 = new DebitAccount("D-001", "Иванов Иван", initialBalance: 50_000m, cashbackRate: 0.005m);
-var debit2 = new DebitAccount("D-002", "Петрова Мария", initialBalance: 12_000m, cashbackRate: 0.01m);
-var credit1 = new CreditAccount("C-001", "Сидоров Алексей", creditLimit: 100_000m, monthlyRate: 0.02m, initialBalance: 5_000m);
-var credit2 = new CreditAccount("C-002", "Козлова Елена", creditLimit: 50_000m, monthlyRate: 0.025m);
-var deposit1 = new DepositAccount("DEP-001", "Иванов Иван",
-                  initialBalance: 200_000m, monthlyRate: 0.008m,
-                  maturityDate: DateTime.Today.AddMonths(12));
+DebitAccount debit1 = new("D-001", "Иванов Иван", initialBalance: 50_000m, cashbackRate: 0.005m);
+DebitAccount debit2 = new("D-002", "Петрова Мария", initialBalance: 12_000m, cashbackRate: 0.01m);
+CreditAccount credit1 = new("C-001", "Сидоров Алексей", creditLimit: 100_000m, monthlyRate: 0.02m, initialBalance: 5_000m);
+CreditAccount credit2 = new("C-002", "Козлова Елена", creditLimit: 50_000m, monthlyRate: 0.025m);
+DepositAccount deposit1 = new("DEP-001", "Иванов Иван",
+    initialBalance: 200_000m, monthlyRate: 0.008m, maturityDate: DateTime.Today.AddMonths(12));
 
-bank.OpenAccount(debit1);
-bank.OpenAccount(debit2);
-bank.OpenAccount(credit1);
-bank.OpenAccount(credit2);
-bank.OpenAccount(deposit1);
+foreach (Account account in new Account[] { debit1, debit2, credit1, credit2, deposit1 })
+    bank.OpenAccount(account);
 
-// ─── Вывод всех счетов (полиморфизм: List<Account>, ToString()) ───────────────
+// ─── Вывод всех счетов ───────────────────────────────────────────────────────
 Console.WriteLine($"\n=== {bank} ===");
-Console.WriteLine("\n-- Все счета при открытии --");
-foreach (Account acc in bank.GetSortedAccounts())
-    Console.WriteLine(acc);
+PrintAccounts("Все счета при открытии", bank.GetSortedAccounts());
 
 // ─── Пополнения ──────────────────────────────────────────────────────────────
 Console.WriteLine("\n-- Пополнения --");
@@ -40,48 +34,48 @@ Console.WriteLine($"Снято с {debit1.AccountNumber}: {withdrawn:C}, ост�
 withdrawn = credit1.Withdraw(30_000m); // уходим в минус
 Console.WriteLine($"Снято с {credit1.AccountNumber}: {withdrawn:C}, баланс: {credit1.Balance:C}");
 
-// Попытка снять больше лимита — поймаем исключение
 Console.WriteLine("\n-- Попытка превысить кредитный лимит --");
-try
-{
-    credit1.Withdraw(200_000m);
-}
-catch (InvalidOperationException ex)
-{
-    Console.WriteLine($"Ошибка: {ex.Message}");
-}
+TryRun(() => credit1.Withdraw(200_000m));
 
-// Попытка снять депозит досрочно
 Console.WriteLine("\n-- Попытка досрочно закрыть депозит --");
-try
-{
-    deposit1.Withdraw(deposit1.Balance);
-}
-catch (InvalidOperationException ex)
-{
-    Console.WriteLine($"Ошибка: {ex.Message}");
-}
+TryRun(() => deposit1.Withdraw(deposit1.Balance));
 
-// ─── Начисление процентов (полиморфизм: каждый тип по-своему) ─────────────────
-Console.WriteLine("\n-- После начисления месячных процентов --");
+// ─── Начисление процентов ────────────────────────────────────────────────────
 bank.ApplyMonthlyInterestToAll();
-foreach (Account acc in bank.GetSortedAccounts())
-    Console.WriteLine(acc);
+PrintAccounts("После начисления месячных процентов", bank.GetSortedAccounts());
 
 // ─── Поиск по владельцу ──────────────────────────────────────────────────────
-Console.WriteLine("\n-- Счета Иванова --");
-foreach (var acc in bank.GetByOwner("Иванов"))
-    Console.WriteLine(acc);
+PrintAccounts("Счета Иванова", bank.GetByOwner("Иванов"));
 
-// ─── Статистика банка (LINQ) ─────────────────────────────────────────────────
+// ─── Статистика банка ────────────────────────────────────────────────────────
 Console.WriteLine("\n-- Статистика по типам счетов --");
-foreach (var (type, count, total) in bank.GetStatsByType())
+foreach ((string type, int count, decimal total) in bank.GetStatsByType())
     Console.WriteLine($"  {type,-18} x{count}  суммарно: {total:C}");
 
 Console.WriteLine($"\nСуммарные активы банка: {bank.TotalAssets:C}");
 Console.WriteLine($"Суммарный долг банка:   {bank.TotalDebt:C}");
 
-// ─── Сортировка (IComparable<Account>) ───────────────────────────────────────
+// ─── Сортировка по балансу ───────────────────────────────────────────────────
 Console.WriteLine("\n-- Счета, отсортированные по балансу (от меньшего к большему) --");
-foreach (var acc in bank.GetSortedAccounts())
-    Console.WriteLine($"  {acc.AccountNumber,-10} {acc.OwnerName,-20} {acc.Balance,12:C}");
+foreach (Account account in bank.GetSortedAccounts())
+    Console.WriteLine($"  {account.AccountNumber,-10} {account.OwnerName,-20} {account.Balance,12:C}");
+
+// ─── Вспомогательные методы ──────────────────────────────────────────────────
+static void PrintAccounts(string title, IEnumerable<Account> accounts)
+{
+    Console.WriteLine($"\n-- {title} --");
+    foreach (Account account in accounts)
+        Console.WriteLine(account);
+}
+
+static void TryRun(Action action)
+{
+    try
+    {
+        action();
+    }
+    catch (InvalidOperationException ex)
+    {
+        Console.WriteLine($"Ошибка: {ex.Message}");
+    }
+}
