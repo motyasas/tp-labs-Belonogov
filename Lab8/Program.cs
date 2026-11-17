@@ -56,14 +56,23 @@ Console.WriteLine($"Медианная сумма: {sorted[sorted.Count / 2]}  (
 
 // --- 5. Сумма покупок каждого покупателя ---
 sw.Restart();
+// Оптимизация: раньше для КАЖДОГО покупателя (m ≈ 5000) просматривался ВЕСЬ список покупок
+// (n = 30 000) - это O(n·m) ≈ 150 млн сравнений строк.
+// Теперь один проход по покупкам: суммы копятся в словаре "покупатель -> сумма" (O(n)).
+Dictionary<string, long> sums = new Dictionary<string, long>();
+for (int i = 0; i < buyers.Count; i++)
+{
+    // TryGetValue: если покупатель уже есть - достаём его сумму, иначе current = 0
+    sums.TryGetValue(buyers[i], out long current);
+    sums[buyers[i]] = current + amounts[i];
+}
+
+// Собираем результат в том же порядке, что и раньше (по списку unique),
+// чтобы при равных суммах MaxBy выбрал того же покупателя, что и исходная версия.
 List<(string Buyer, long Total)> totals = new List<(string Buyer, long Total)>();
 foreach (string b in unique)
 {
-    long total = 0;
-    for (int i = 0; i < buyers.Count; i++)
-        if (buyers[i] == b)
-            total += amounts[i];
-    totals.Add((b, total));
+    totals.Add((b, sums[b]));
 }
 Console.WriteLine($"Максимум потратил: {totals.MaxBy(t => t.Total).Buyer}  ({sw.ElapsedMilliseconds} мс)");
 
