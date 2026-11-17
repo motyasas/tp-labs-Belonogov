@@ -31,6 +31,15 @@ public static class MathAlgorithms
         {
             list.Add(a);
 
+            // Исправление ошибки: раньше a + b молча переполнялось у границы long.
+            if (b > long.MaxValue - a)
+            {
+                // следующее число после b не помещается в long, но сам b ещё может подойти
+                if (b <= n)
+                    list.Add(b);
+                break;
+            }
+
             long next = a + b;
             a = b;
             b = next;
