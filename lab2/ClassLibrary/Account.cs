@@ -47,7 +47,7 @@ public abstract class Account : IComparable<Account>
     public abstract void ApplyInterest();
 
     // Нужен для сортировки по балансу
-    public int CompareTo(Account other)
+    public int CompareTo(Account? other)
     {
         if (other == null)
         {

@@ -33,8 +33,9 @@ public class Bank
         _accounts.Add(account);
     }
 
-    // Найти счёт по номеру (если не найден — вернёт null)
-    public Account FindByNumber(string accountNumber)
+    // Найти счёт по номеру (если не найден — вернёт null).
+    // Знак ? после типа означает: результат может быть null.
+    public Account? FindByNumber(string accountNumber)
     {
         foreach (Account account in _accounts)
         {
