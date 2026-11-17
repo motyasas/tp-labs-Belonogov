@@ -18,9 +18,14 @@ for (int i = 0; i < N; i++)
 // --- 2. Список уникальных покупателей ---
 Stopwatch sw = Stopwatch.StartNew();
 List<string> unique = new List<string>();
+// Оптимизация: List.Contains просматривает весь список (O(n)), и в цикле получается O(n^2).
+// HashSet ищет элемент по хешу почти мгновенно (O(1)).
+// HashSet.Add возвращает true, если элемента ещё не было - тогда добавляем его и в список
+// (список нужен, чтобы сохранить порядок покупателей, как в исходной версии).
+HashSet<string> seen = new HashSet<string>();
 for (int i = 0; i < buyers.Count; i++)
 {
-    if (!unique.Contains(buyers[i]))
+    if (seen.Add(buyers[i]))
         unique.Add(buyers[i]);
 }
 Console.WriteLine($"Уникальных покупателей: {unique.Count}  ({sw.ElapsedMilliseconds} мс)");
