@@ -32,11 +32,18 @@ Console.WriteLine($"Уникальных покупателей: {unique.Count} 
 
 // --- 3. Текстовый отчёт ---
 sw.Restart();
-string report = "";
+// Оптимизация: строка в C# неизменяемая, поэтому "report +=" каждый раз создаёт НОВУЮ строку
+// и копирует в неё весь накопленный текст - это O(n^2) по времени и тысячи лишних объектов.
+// StringBuilder дописывает текст в свой внутренний буфер без копирования всего подряд.
+StringBuilder builder = new StringBuilder();
 for (int i = 0; i < buyers.Count; i++)
 {
-    report += buyers[i] + ";" + amounts[i] + Environment.NewLine;
+    builder.Append(buyers[i]);
+    builder.Append(';');
+    builder.Append(amounts[i]);
+    builder.Append(Environment.NewLine);
 }
+string report = builder.ToString();
 Console.WriteLine($"Отчёт: {report.Length} символов  ({sw.ElapsedMilliseconds} мс)");
 
 // --- 4. Сортировка сумм ---
