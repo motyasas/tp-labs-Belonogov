@@ -14,7 +14,7 @@ public class DepositAccountTests
         return new DepositAccount("DEP-001", "Иванов Иван", 1000m, 0.01m, Maturity);
     }
 
-    // ───────────── Конструктор / инварианты ─────────────
+    //  Конструктор / инварианты 
 
     [Fact]
     public void Constructor_ValidArguments_AccountIsOpen()
@@ -63,7 +63,7 @@ public class DepositAccountTests
             () => new DepositAccount("DEP-1", "Иванов", 1000m, (decimal)rate, Maturity));
     }
 
-    // ───────────── Снятие ─────────────
+    //  Снятие 
 
     [Fact]
     public void Withdraw_BeforeMaturity_ThrowsAndKeepsAccountOpen()
@@ -127,7 +127,7 @@ public class DepositAccountTests
             () => account.WithdrawOnDate(1000m, Maturity));
     }
 
-    // ───────────── Проценты и ToString ─────────────
+    //  Проценты и ToString 
 
     [Fact]
     public void ApplyInterest_OpenDeposit_AddsMonthlyInterest()

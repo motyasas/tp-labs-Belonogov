@@ -14,7 +14,7 @@ public class BankTests
         return new CreditAccount(number, owner, balance, 10000m, 0.02m);
     }
 
-    // ───────────── Конструктор ─────────────
+    //  Конструктор 
 
     [Theory]
     [InlineData(null)]
@@ -25,7 +25,7 @@ public class BankTests
         Assert.Throws<ArgumentException>(() => new Bank(name!));
     }
 
-    // ───────────── OpenAccount / FindByNumber ─────────────
+    //  OpenAccount / FindByNumber 
 
     [Fact]
     public void OpenAccount_NewAccount_CanBeFoundByNumber()
@@ -69,7 +69,7 @@ public class BankTests
         Assert.Null(bank.FindByNumber("X-999"));
     }
 
-    // ───────────── GetByOwner ─────────────
+    //  GetByOwner 
 
     [Fact]
     public void GetByOwner_PartOfName_ReturnsAllMatching()
@@ -97,7 +97,7 @@ public class BankTests
         Assert.Empty(bank.GetByOwner("Сидоров"));
     }
 
-    // ───────────── Активы / долги ─────────────
+    //  Активы / долги 
 
     [Fact]
     public void Totals_EmptyBank_AreZero()
@@ -125,7 +125,7 @@ public class BankTests
         Assert.Equal(300m, bank.GetTotalDebt());
     }
 
-    // ───────────── Статистика по типам ─────────────
+    //  Статистика по типам 
 
     [Fact]
     public void CountByType_And_SumByType_ReturnValuesForRequestedTypeOnly()
@@ -153,7 +153,7 @@ public class BankTests
         Assert.Equal(0m, bank.SumByType("DepositAccount"));
     }
 
-    // ───────────── Сортировка / проценты ─────────────
+    //  Сортировка / проценты 
 
     [Fact]
     public void GetSortedAccounts_ReturnsAscendingByBalance()

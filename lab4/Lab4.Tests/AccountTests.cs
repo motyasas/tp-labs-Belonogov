@@ -11,7 +11,7 @@ public class AccountTests
         return new DebitAccount("D-001", "Иванов Иван", balance, cashback);
     }
 
-    // ───────────── Конструктор / инварианты ─────────────
+    //  Конструктор / инварианты 
 
     [Fact]
     public void Constructor_ValidArguments_SetsProperties()
@@ -76,7 +76,7 @@ public class AccountTests
         Assert.Equal(0m, account.CashbackRate);
     }
 
-    // ───────────── Deposit ─────────────
+    //  Deposit 
 
     [Fact]
     public void Deposit_PositiveAmount_IncreasesBalance()
@@ -105,7 +105,7 @@ public class AccountTests
         Assert.Equal(1000m, account.Balance);
     }
 
-    // ───────────── Withdraw (дебетовый) ─────────────
+    //  Withdraw (дебетовый) 
 
     [Fact]
     public void Withdraw_LessThanBalance_DecreasesBalanceAndReturnsAmount()
@@ -153,7 +153,7 @@ public class AccountTests
         Assert.Throws<ArgumentException>(() => account.Withdraw((decimal)amount));
     }
 
-    // ───────────── ApplyInterest / сравнение ─────────────
+    //  ApplyInterest / сравнение 
 
     [Fact]
     public void ApplyInterest_Debit_AddsCashback()

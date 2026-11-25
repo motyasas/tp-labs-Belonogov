@@ -5,7 +5,7 @@ namespace Lab4.Tests;
 
 public class MathAlgorithmsTests
 {
-    // ───────────── Factorial ─────────────
+    //  Factorial 
 
     [Fact]
     public void Factorial_OfZero_ReturnsOne()
@@ -73,7 +73,7 @@ public class MathAlgorithmsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => MathAlgorithms.Factorial(n));
     }
 
-    // ───────────── FibonacciUpTo ─────────────
+    //  FibonacciUpTo 
 
     [Fact]
     public void FibonacciUpTo_Zero_ReturnsOnlyZero()
@@ -129,7 +129,7 @@ public class MathAlgorithmsTests
         Assert.All(result, value => Assert.True(value >= 0));
     }
 
-    // ───────────── FunctionA ─────────────
+    //  FunctionA 
 
     [Fact]
     public void FunctionA_AtDomainBoundaryOne_ReturnsExpected()
@@ -178,7 +178,7 @@ public class MathAlgorithmsTests
         Assert.Throws<OverflowException>(() => MathAlgorithms.FunctionA(142));
     }
 
-    // ───────────── SinTaylor ─────────────
+    //  SinTaylor 
 
     [Theory]
     [InlineData(0)]
