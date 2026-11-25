@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 // Лабораторная работа 3, вариант 6: статистика текстового файла.
 // Здесь только меню и ввод-вывод, вся логика подсчёта - в Textstats.cs.
 
-// Регистрируем провайдер кодировок (без этого Windows-1251 и CP866 недоступны)
+// Регистрируем провайдер кодировок
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -38,7 +38,7 @@ while (running)
     }
 }
 
-// ---------------- Методы меню ----------------
+//  Методы меню 
 
 static void PrintMenu()
 {
@@ -117,7 +117,7 @@ static void ShowEncodingHelp()
     Console.WriteLine("Если текст отображается «кракозябрами» - попробуйте другую кодировку.");
 }
 
-// ---------------- Ввод данных ----------------
+//  Ввод данных 
 
 // Возвращает полный путь к файлу или null, если ввод некорректный
 static string? AskFilePath()
@@ -173,7 +173,7 @@ static Encoding? AskEncoding()
     }
 }
 
-// ---------------- Вывод результата ----------------
+//  Вывод результата 
 
 static void PrintStats(TextStatistics stats)
 {
