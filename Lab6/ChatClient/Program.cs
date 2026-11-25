@@ -6,7 +6,7 @@ using System.Text;
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8; // чтобы русские буквы правильно вводились
 
-// ---------- Адрес и порт ----------
+//  Адрес и порт 
 
 Console.Write("Адрес сервера (Enter = localhost): ");
 string? host = Console.ReadLine();
@@ -27,7 +27,7 @@ if (!string.IsNullOrWhiteSpace(portInput))
     }
 }
 
-// ---------- Подключение ----------
+//  Подключение 
 
 TcpClient client = new TcpClient();
 try
@@ -48,7 +48,7 @@ writer.AutoFlush = true; // каждая строка уходит на серв
 
 try
 {
-    // ---------- Выбор ника ----------
+    //  Выбор ника 
     // Повторяем, пока сервер не ответит "OK"
     bool nickAccepted = false;
     while (!nickAccepted)
@@ -82,7 +82,7 @@ try
 
     Console.WriteLine("Подключено! Команды: /list - кто в чате, /w ник текст - личное сообщение, /exit - выход.");
 
-    // ---------- Приём сообщений ----------
+    //  Приём сообщений 
     // Сообщения от сервера могут прийти в любой момент, даже пока мы печатаем.
     // Поэтому читаем их в отдельной задаче, параллельно с вводом с клавиатуры.
     Task receiveTask = Task.Run(async () =>
@@ -103,7 +103,7 @@ try
         Console.WriteLine("Соединение с сервером закрыто. Нажмите Enter для выхода.");
     });
 
-    // ---------- Отправка сообщений ----------
+    //  Отправка сообщений 
     while (true)
     {
         string? message = Console.ReadLine();
